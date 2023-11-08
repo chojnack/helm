@@ -127,6 +127,7 @@ func TestRollbackFileCompletion(t *testing.T) {
 func TestRollbackWithLabels(t *testing.T) {
 	labels1 := map[string]string{"operation": "install", "firstLabel": "firstValue"}
 	labels2 := map[string]string{"operation": "upgrade", "secondLabel": "secondValue"}
+	expectedLabels := map[string]string{"operation": "rollback", "firstLabel": "firstValue"}
 
 	releaseName := "funny-bunny-labels"
 	rels := []*release.Release{
@@ -151,7 +152,7 @@ func TestRollbackWithLabels(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	_, _, err := executeActionCommandC(storage, fmt.Sprintf("rollback %s 1", releaseName))
+	_, _, err := executeActionCommandC(storage, fmt.Sprintf("rollback -l operation=rollback %s 1", releaseName))
 	if err != nil {
 		t.Errorf("unexpected error, got '%v'", err)
 	}
@@ -160,7 +161,7 @@ func TestRollbackWithLabels(t *testing.T) {
 		t.Errorf("unexpected error, got '%v'", err)
 	}
 
-	if !reflect.DeepEqual(updatedRel.Labels, labels1) {
-		t.Errorf("Expected {%v}, got {%v}", labels1, updatedRel.Labels)
+	if !reflect.DeepEqual(updatedRel.Labels, expectedLabels) {
+		t.Errorf("Expected {%v}, got {%v}", expectedLabels, updatedRel.Labels)
 	}
 }
